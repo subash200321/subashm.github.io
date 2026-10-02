@@ -21,12 +21,21 @@
 
 <section class="card">
 <h2>2. Resume checker</h2>
-<select id="target"></select>
-<textarea id="resume" rows="10" style="margin-top:8px" placeholder="Paste your resume text here"></textarea>
+<label style="font-size:.85rem;color:var(--mu)">Upload your resume (PDF, Word .docx or .txt)</label>
+<input type="file" id="file" accept=".pdf,.docx,.txt">
+<div class="note" id="fstat"></div>
+<div class="row" style="margin-top:8px">
+<select id="target" style="flex:1 1 180px;width:auto"></select>
+<select id="exp" style="flex:1 1 160px;width:auto"><option>Fresher / student</option><option>0–2 years</option><option>2–5 years</option><option>5+ years</option></select>
+<input id="co" placeholder="Company (blank = all companies)">
+</div>
+<textarea id="resume" rows="6" style="margin-top:8px" placeholder="...or paste your resume text here"></textarea>
 <div style="margin-top:8px"><button id="check">Check my resume</button></div>
 <div id="result" style="margin-top:16px"></div>
 <p class="note">Your text is checked in your browser and never uploaded.</p>
 </section>
 </main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
 <script src="app.js"></script>
 </body></html>
