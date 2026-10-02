@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FinHire – Finance Job Finder & Resume Checker</title>
+<link rel="stylesheet" href="style.css"></head>
+<body><main>
+<h1>FinHire</h1>
+<p class="sub">Find finance jobs across every company, see typical pay, and check your resume.</p>
+
+<section class="card">
+<h2>1. Find finance jobs</h2>
+<div class="row" id="chips"></div>
+<div class="row" style="margin-top:12px">
+<input id="company" placeholder="Company (optional – leave blank for all)">
+<input id="loc" placeholder="Location (e.g. Mumbai, Remote)">
+</div>
+<div id="roleInfo" class="tbl" style="margin-top:12px"></div>
+<div class="links" id="links"></div>
+<p class="note">Opens live listings on each job site, so you always see current openings, companies and where to apply. Pay figures are rough indicative ranges for India (₹ LPA, entry to experienced), not offers; verify on AmbitionBox or Glassdoor.</p>
+</section>
+
+<section class="card">
+<h2>2. Resume checker</h2>
+<select id="target"></select>
+<textarea id="resume" rows="10" style="margin-top:8px" placeholder="Paste your resume text here"></textarea>
+<div style="margin-top:8px"><button id="check">Check my resume</button></div>
+<div id="result" style="margin-top:16px"></div>
+<p class="note">Your text is checked in your browser and never uploaded.</p>
+</section>
+</main>
+<script src="app.js"></script>
+</body></html>
