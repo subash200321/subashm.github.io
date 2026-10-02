@@ -1,4 +1,3 @@
-
 const ROLES={
 "Financial Analyst":["4–12","financial analysis forecasting variance budgeting excel modeling reporting"],
 "Investment Banking":["10–30","valuation dcf m&a financial modeling pitchbook due diligence comps"],
@@ -60,3 +59,47 @@ $("check").onclick=()=>{
  tests.map(x=>`<div class="item ${x.ok?'ok':'warn'}">${x.ok?'✔':'✖'} ${x.msg}</div>`).join("")+
  `<p class="note">This is an automated checklist, not a recruiter's opinion. Use it to catch common gaps.</p>`;
 };
+
+// ---- Resume upload + experience + companies ----
+const PDFJS="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+if(window.pdfjsLib)pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+"pdf.worker.min.js";
+$("file").onchange=async e=>{
+ const f=e.target.files[0];if(!f)return;
+ $("fstat").textContent="Reading "+f.name+"...";
+ try{
+  let txt="";const n=f.name.toLowerCase();
+  if(n.endsWith(".pdf")){
+   const pdf=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;
+   for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const c=await pg.getTextContent();txt+=c.items.map(x=>x.str).join(" ")+"\n"}
+  }else if(n.endsWith(".docx")){txt=(await mammoth.extractRawText({arrayBuffer:await f.arrayBuffer()})).value}
+  else txt=await f.text();
+  txt=txt.trim();$("resume").value=txt;
+  $("fstat").textContent=txt?"Loaded "+f.name+" ("+(txt.match(/\S+/g)||[]).length+" words). Now click Check my resume.":"No text found. Scanned PDFs can't be read; paste the text instead.";
+ }catch(err){$("fstat").textContent="Couldn't read that file. Paste the text instead."}
+};
+const KNOWN=["Deloitte","KPMG","EY","PwC","JPMorgan","Goldman Sachs","Morgan Stanley","Citi","Barclays","HSBC","HDFC","ICICI","Axis Bank","SBI","Kotak","Yes Bank","IDFC","Bajaj","Accenture","Infosys","TCS","Wipro","Cognizant","Amazon","Zerodha","Edelweiss","Motilal Oswal","CRISIL","ICRA","Mahindra"];
+const CO_RE=/[A-Z][\w&.'-]*(?:\s+[A-Z&][\w&.'-]*){0,4}\s+(?:Pvt\.?\s*Ltd\.?|Private Limited|Limited|Ltd\.?|Inc\.?|LLP|LLC|Bank|Corporation|Corp\.?|Capital|Securities|Finance|Financial|Consulting|Industries|Partners)/g;
+const EXPTIPS=[
+ "Fresher: lead with internships, academic projects and certifications (CFA L1, NISM, Excel/SQL). Keep it to one page.",
+ "0–2 years: show 2–3 achievements with numbers per role, plus tools used (Excel, SQL, Power BI, Tally).",
+ "2–5 years: put impact first (cost saved, revenue, accuracy, turnaround) and show ownership of reports or models.",
+ "5+ years: highlight team size, budgets or portfolio size handled, and leadership. Keep older roles brief."];
+$("check").addEventListener("click",()=>setTimeout(()=>{
+ const t=$("resume").value;if((t.match(/\S+/g)||[]).length<30)return;
+ const low=t.toLowerCase(),set=new Set();
+ (t.match(CO_RE)||[]).forEach(x=>set.add(x.trim()));
+ KNOWN.forEach(k=>{if(new RegExp("\\b"+k+"\\b","i").test(t))set.add(k)});
+ const cos=[...set].slice(0,12);
+ const ys=[...low.matchAll(/(\d{1,2})(?:\.\d)?\+?\s*(?:years?|yrs?)/g)].map(m=>+m[1]).filter(n=>n<=40);
+ const yrs=ys.length?Math.max(...ys):null;
+ const lvl=$("exp").selectedIndex,co=$("co").value.trim();
+ let h='<h3 style="margin:16px 0 6px">Experience & companies</h3>';
+ h+=`<div class="item">Experience you selected: <b>${$("exp").value}</b>${yrs!==null?` · years mentioned in resume: <b>${yrs}</b>`:""}</div>`;
+ if(yrs!==null){const m=yrs>=5?3:yrs>=2?2:yrs>=1?1:0;if(m!==lvl)h+='<div class="item warn">✖ The years in your resume don\'t match the level you selected. Check both.</div>'}
+ h+=`<div class="item">${EXPTIPS[lvl]}</div>`;
+ h+=`<div class="item">Companies found in your resume: <b>${cos.length?cos.join(", "):"none detected (add employer names clearly)"}</b></div>`;
+ const q=(co||"")+" "+role+" finance",k=enc(q.trim());
+ h+=`<div class="item">Jobs for ${role} at <b>${co||"all companies"}</b>:</div><div class="links">`+
+ [["LinkedIn","https://www.linkedin.com/jobs/search/?keywords="+k],["Naukri","https://www.naukri.com/"+q.trim().toLowerCase().replace(/[^a-z0-9]+/g,"-")+"-jobs"],["Indeed","https://in.indeed.com/jobs?q="+k],["Google Jobs","https://www.google.com/search?q="+k+"&ibp=htl;jobs"]].map(([n,l])=>`<a class="btn" target="_blank" rel="noopener" href="${l}">${n}</a>`).join("")+"</div>";
+ $("result").insertAdjacentHTML("beforeend",h);
+},0));
